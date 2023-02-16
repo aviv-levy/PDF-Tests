@@ -3,6 +3,7 @@ const express = require('express');
 const app = express();
 const cors = require('cors');
 const { join } = require("path");
+const path = require('path')
 
 app.use(cors());
 const { jsPDF } = require('jspdf');
@@ -10,6 +11,9 @@ const bodyParser = require('body-parser');
 app.use(bodyParser.json())
 
 app.use(express.json());
+
+const https = require("https");
+var fs = require('fs');
 
 app.set("views", join(__dirname, "views"));
 app.use(express.static(__dirname));
@@ -40,6 +44,12 @@ app.get('/', (req, res) => {
 
 app.use('/homepage',homepage)
 
-app.listen(3000, () => {
+const httpsServer = https.createServer({
+    key:fs.readFileSync(path.join(__dirname,'key.pem')),
+    cert:fs.readFileSync(path.join(__dirname,'cert.pem'))
+},app)
+
+
+httpsServer.listen(443, () => {
     console.log('Server is running ...');
 })
